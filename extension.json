@@ -1,0 +1,77 @@
+{
+    "name": "SivugVehashlama",
+    "version": "1.0.0",
+    "author": [
+        "[https://www.hamichlol.org.il/משתמש:נריה נריה]"
+    ],
+    "url": "https://www.hamichlol.org.il",
+    "descriptionmsg": "sivugvehashlama-desc",
+    "license-name": "MIT",
+    "type": "aspaklarya",
+    "requires": {
+        "MediaWiki": ">= 1.43.0"
+    },
+    "SpecialPages": {
+        "SivugVehashlama": "SpecialSivugVehashlama"
+    },
+    "MessagesDirs": {
+        "SivugVehashlama": [
+            "i18n"
+        ]
+    },
+    "AutoloadClasses": {
+        "SivugVehashlamaHooks": "includes/SivugVehashlamaHooks.php",
+        "SivugVehashlamaDatabase": "includes/SivugVehashlamaDatabase.php",
+        "SpecialSivugVehashlama": "includes/SpecialSivugVehashlama.php",
+        "SivugVehashlamaLogFormatter": "includes/SivugVehashlamaLogFormatter.php"
+    },
+    "ExtensionMessagesFiles": {
+        "SivugVehashlamaAlias": "SivugVehashlama.alias.php",
+        "SivugVehashlamaMagic": "SivugVehashlama.i18n.magic.php"
+    },
+    "ResourceModules": {
+        "ext.sivugVehashlama": {
+            "styles": [
+                "modules/ext.sivugVehashlama.css"
+            ],
+            "scripts": [
+                "modules/ext.sivugVehashlama.js"
+            ],
+            "dependencies": [
+                "mediawiki.util",
+                "mediawiki.api"
+            ],
+            "messages": [
+                "sivugvehashlama-confirm-simple",
+                "sivugvehashlama-confirm-complex",
+                "sivugvehashlama-confirm-done"
+            ]
+        }
+    },
+    "ResourceFileModulePaths": {
+        "localBasePath": "",
+        "remoteExtPath": "SivugVehashlama"
+    },
+    "Hooks": {
+        "LoadExtensionSchemaUpdates": "SivugVehashlamaHooks::onLoadExtensionSchemaUpdates",
+        "LogNames": "SivugVehashlamaHooks::onLogNames",
+        "LogHeadersLogHeaders": "SivugVehashlamaHooks::onLogHeadersLogHeaders",
+        "LogActions": "SivugVehashlamaHooks::onLogActions",
+        "LogFormatter": "SivugVehashlamaHooks::onLogFormatter"
+    },
+    "GroupPermissions": {
+        "aspaklaryaEditor": {
+            "sivugvehashlama": true
+        }
+    },
+    "AvailableRights": [
+        "sivugvehashlama"
+    ],
+    "LogTypes": [
+        "sivugvehashlama"
+    ],
+    "LogActionsHandlers": {
+        "sivugvehashlama/*": "SivugVehashlamaLogFormatter"
+    },
+    "manifest_version": 2
+}

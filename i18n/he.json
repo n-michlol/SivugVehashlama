@@ -1,0 +1,32 @@
+{
+    "@metadata": {
+        "authors": [
+            "Neriah"
+        ]
+    },
+    "sivugvehashlama-desc": "הרחבה לסיווג והשלמת ניקוי אספקלריה באתר המכלול",
+    "sivugvehashlama": "סיווג והשלמה",
+    "sivugvehashlama-pending": "ערכים בהמתנה לסיווג",
+    "sivugvehashlama-simple": "ערכים הדורשים טיפול פשוט",
+    "sivugvehashlama-complex": "ערכים הדורשים טיפול מורכב",
+    "sivugvehashlama-mark-simple": "סמן כפשוט",
+    "sivugvehashlama-mark-complex": "סמן כמורכב",
+    "sivugvehashlama-mark-done": "סמן כמטופל",
+    "sivugvehashlama-view-source": "הצג קוד מקור",
+    "sivugvehashlama-classified-by": "סווג על ידי",
+    "sivugvehashlama-classification-date": "תאריך סיווג",
+    "sivugvehashlama-no-items": "אין ערכים בקטגוריה זו",
+    "sivugvehashlama-permission-denied": "אין לך הרשאה לגשת לדף זה. דף זה מיועד לחברי קבוצת aspaklaryaEditor בלבד.",
+    "sivugvehashlama-tab-pending": "בהמתנה לסיווג",
+    "sivugvehashlama-tab-simple": "טיפול פשוט",
+    "sivugvehashlama-tab-complex": "טיפול מורכב",
+    "log-name-sivugvehashlama": "יומן מיזם סיווג והשלמה",
+    "log-description-sivugvehashlama": "יומן פעולות עבור מיזם סיווג והשלמת ניקוי אספקלריה",
+    "logentry-sivugvehashlama-marksimple": "$1 {{GENDER:$2|סימן|סימנה}} את הערך $3 כפשוט לטיפול",
+    "logentry-sivugvehashlama-markcomplex": "$1 {{GENDER:$2|סימן|סימנה}} את הערך $3 כמורכב לטיפול",
+    "logentry-sivugvehashlama-marksimpledone": "$1 {{GENDER:$2|טיפל|טיפלה}} בערך הפשוט $3",
+    "logentry-sivugvehashlama-markcomplexdone": "$1 {{GENDER:$2|טיפל|טיפלה}} בערך המורכב $3",
+    "sivugvehashlama-confirm-simple": "האם אתה בטוח שברצונך לסמן ערך זה כדורש טיפול פשוט?",
+    "sivugvehashlama-confirm-complex": "האם אתה בטוח שברצונך לסמן ערך זה כדורש טיפול מורכב?",
+    "sivugvehashlama-confirm-done": "האם אתה בטוח שברצונך לסמן ערך זה כמטופל?"
+}
