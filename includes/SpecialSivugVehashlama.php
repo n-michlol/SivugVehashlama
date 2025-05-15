@@ -21,6 +21,14 @@ class SpecialSivugVehashlama extends SpecialPage {
         $this->setHeaders();
         $output->addModules( 'ext.sivugVehashlama' );
         
+        if ( $request->getVal( 'action' ) === 'viewsource' ) {
+            $pageId = $request->getInt( 'pageid' );
+            if ( $pageId ) {
+                $this->showPageSource( $pageId );
+                return;
+            }
+        }
+        
         $this->handleActions( $request, $user );
         
         $this->displayInterface( $subPage );
@@ -295,7 +303,8 @@ class SpecialSivugVehashlama extends SpecialPage {
         
         $output->setPageTitle( $this->msg( 'sivugvehashlama-view-source' )->text() . ': ' . $title->getPrefixedText() );
         
-        $page = WikiPage::factory( $title );
+        $wikiPageFactory = \MediaWiki\MediaWikiServices::getInstance()->getWikiPageFactory();
+        $page = $wikiPageFactory->newFromTitle( $title );
         $content = $page->getContent();
         
         if ( !$content ) {
@@ -346,19 +355,5 @@ class SpecialSivugVehashlama extends SpecialPage {
 
     protected function getGroupName() {
         return 'other';
-    }
-    
-    public function onSpecialPageBeforeExecute( $subPage ) {
-        $request = $this->getRequest();
-        
-        if ( $request->getVal( 'action' ) == 'viewsource' ) {
-            $pageId = $request->getInt( 'pageid' );
-            if ( $pageId ) {
-                $this->showPageSource( $pageId );
-                return false;
-            }
-        }
-        
-        return true;
     }
 }
