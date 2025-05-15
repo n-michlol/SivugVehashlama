@@ -12,8 +12,10 @@ class SivugVehashlamaLogFormatter extends LogFormatter {
     }
     
     protected function getMessageKey() {
-        $action = $this->entry->getAction();
-        $key = 'logentry-sivugvehashlama-' . $action;
+        $entry = $this->entry;
+        $type = $entry->getType();
+        $action = $entry->getSubtype();
+        $key = 'logentry-' . $type . '-' . $action;
         
         return $key;
     }
