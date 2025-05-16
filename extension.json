@@ -44,7 +44,10 @@
             "messages": [
                 "sivugvehashlama-confirm-simple",
                 "sivugvehashlama-confirm-complex",
-                "sivugvehashlama-confirm-done"
+                "sivugvehashlama-confirm-done",
+                "sivugvehashlama-loading",
+                "sivugvehashlama-close",
+                "sivugvehashlama-error-loading"
             ]
         }
     },

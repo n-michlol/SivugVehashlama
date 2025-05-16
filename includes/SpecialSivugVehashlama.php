@@ -188,11 +188,6 @@ class SpecialSivugVehashlama extends SpecialPage {
     }
     
     private function formatPendingItem( $title, $pageId ) {
-        $viewSourceUrl = $this->getPageTitle()->getLocalURL( [
-            'action' => 'viewsource',
-            'pageid' => $pageId
-        ] );
-        
         $markSimpleUrl = $this->getPageTitle()->getLocalURL( [
             'action' => 'marksimple',
             'pageid' => $pageId
@@ -213,8 +208,10 @@ class SpecialSivugVehashlama extends SpecialPage {
         
         $html .= Html::rawElement( 'a', 
             [ 
-                'href' => $viewSourceUrl,
-                'class' => 'sivug-button sivug-view-source'
+                'href' => '#',
+                'class' => 'sivug-button sivug-view-source',
+                'data-pageid' => $pageId,
+                'data-title' => $title->getPrefixedText()
             ],
             $this->msg( 'sivugvehashlama-view-source' )->text()
         );
