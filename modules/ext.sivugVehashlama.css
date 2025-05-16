@@ -114,3 +114,57 @@
         flex-direction: column;
     }
 }
+
+.sivug-pagination {
+    margin: 1em 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+}
+
+.sivug-page-link {
+    display: inline-block;
+    padding: 0.3em 0.6em;
+    border: 1px solid #a2a9b1;
+    border-radius: 3px;
+    background-color: #f8f9fa;
+    color: #0645ad;
+    text-decoration: none;
+}
+
+.sivug-page-link:hover {
+    background-color: #fff;
+    border-color: #447ff5;
+}
+
+.sivug-page-info {
+    display: inline-block;
+    padding: 0.3em 0.6em;
+}
+
+.sivug-page-size-selector {
+    margin-bottom: 1em;
+    text-align: right;
+}
+
+.sivug-page-size {
+    display: inline-block;
+    padding: 0.2em 0.4em;
+    border: 1px solid #a2a9b1;
+    border-radius: 3px;
+    margin-left: 0.2em;
+    text-decoration: none;
+    color: #0645ad;
+}
+
+.sivug-page-size:hover {
+    background-color: #f8f9fa;
+}
+
+.sivug-page-size-current {
+    background-color: #eaecf0;
+    color: #000;
+    font-weight: bold;
+}

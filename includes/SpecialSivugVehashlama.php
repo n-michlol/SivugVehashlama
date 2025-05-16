@@ -2,6 +2,9 @@
 
 class SpecialSivugVehashlama extends SpecialPage {
     private $database;
+    private $itemsPerPage;
+    private $pageSizes = [20, 50, 100, 200];
+    private $defaultPageSize = 50;
     
     public function __construct() {
         parent::__construct( 'SivugVehashlama', 'sivugvehashlama' );
@@ -18,6 +21,8 @@ class SpecialSivugVehashlama extends SpecialPage {
             return;
         }
         
+        $this->setItemsPerPage( $request );
+        
         $this->setHeaders();
         $output->addModules( 'ext.sivugVehashlama' );
         
@@ -32,6 +37,25 @@ class SpecialSivugVehashlama extends SpecialPage {
         $this->handleActions( $request, $user );
         
         $this->displayInterface( $subPage );
+    }
+    
+    private function setItemsPerPage( $request ) {
+        $itemsPerPage = $request->getInt( 'limit', 0 );
+        
+        if ( !in_array( $itemsPerPage, $this->pageSizes ) ) {
+            $userOptionsLookup = \MediaWiki\MediaWikiServices::getInstance()->getUserOptionsLookup();
+            $itemsPerPage = $userOptionsLookup->getOption( $this->getUser(), 'sivugvehashlama-pagesize', $this->defaultPageSize );
+            
+            if ( !in_array( $itemsPerPage, $this->pageSizes ) ) {
+                $itemsPerPage = $this->defaultPageSize;
+            }
+        } else {
+            $userOptionsManager = \MediaWiki\MediaWikiServices::getInstance()->getUserOptionsManager();
+            $userOptionsManager->setOption( $this->getUser(), 'sivugvehashlama-pagesize', $itemsPerPage );
+            $userOptionsManager->saveOptions( $this->getUser() );
+        }
+        
+        $this->itemsPerPage = $itemsPerPage;
     }
     
     private function handleActions( $request, $user ) {
@@ -129,9 +153,17 @@ class SpecialSivugVehashlama extends SpecialPage {
 
     private function showPendingPages() {
         $output = $this->getOutput();
-        $pages = $this->database->getPendingPages();
+        $request = $this->getRequest();
+        
+        $offset = $request->getInt( 'offset', 0 );
+        
+        $pagesData = $this->database->getPendingPages( $this->itemsPerPage, $offset );
+        $pages = $pagesData['pages'];
+        $total = $pagesData['total'];
         
         $output->addHTML( Html::element( 'h2', [], $this->msg( 'sivugvehashlama-pending' )->text() ) );
+        
+        $this->addPageSizeSelector( 'pending' );
         
         if ( count( $pages ) === 0 ) {
             $output->addHTML( Html::element( 'p', [], $this->msg( 'sivugvehashlama-no-items' )->text() ) );
@@ -151,6 +183,8 @@ class SpecialSivugVehashlama extends SpecialPage {
         
         $html .= Html::closeElement( 'div' );
         $output->addHTML( $html );
+        
+        $this->addPaginationLinks( 'pending', $offset, $total );
     }
     
     private function formatPendingItem( $title, $pageId ) {
@@ -209,9 +243,17 @@ class SpecialSivugVehashlama extends SpecialPage {
     
     private function showSimplePages() {
         $output = $this->getOutput();
-        $pages = $this->database->getSimplePages();
+        $request = $this->getRequest();
+        
+        $offset = $request->getInt( 'offset', 0 );
+        
+        $pagesData = $this->database->getSimplePages( $this->itemsPerPage, $offset );
+        $pages = $pagesData['pages'];
+        $total = $pagesData['total'];
         
         $output->addHTML( Html::element( 'h2', [], $this->msg( 'sivugvehashlama-simple' )->text() ) );
+        
+        $this->addPageSizeSelector( 'simple' );
         
         if ( count( $pages ) === 0 ) {
             $output->addHTML( Html::element( 'p', [], $this->msg( 'sivugvehashlama-no-items' )->text() ) );
@@ -219,13 +261,23 @@ class SpecialSivugVehashlama extends SpecialPage {
         }
         
         $this->showClassifiedPages( $pages, 'simple' );
+        
+        $this->addPaginationLinks( 'simple', $offset, $total );
     }
     
     private function showComplexPages() {
         $output = $this->getOutput();
-        $pages = $this->database->getComplexPages();
+        $request = $this->getRequest();
+        
+        $offset = $request->getInt( 'offset', 0 );
+        
+        $pagesData = $this->database->getComplexPages( $this->itemsPerPage, $offset );
+        $pages = $pagesData['pages'];
+        $total = $pagesData['total'];
         
         $output->addHTML( Html::element( 'h2', [], $this->msg( 'sivugvehashlama-complex' )->text() ) );
+        
+        $this->addPageSizeSelector( 'complex' );
         
         if ( count( $pages ) === 0 ) {
             $output->addHTML( Html::element( 'p', [], $this->msg( 'sivugvehashlama-no-items' )->text() ) );
@@ -233,6 +285,8 @@ class SpecialSivugVehashlama extends SpecialPage {
         }
         
         $this->showClassifiedPages( $pages, 'complex' );
+        
+        $this->addPaginationLinks( 'complex', $offset, $total );
     }
     
     private function showClassifiedPages( $pages, $type ) {
@@ -290,6 +344,85 @@ class SpecialSivugVehashlama extends SpecialPage {
         }
         
         $html .= Html::closeElement( 'table' );
+        $output->addHTML( $html );
+    }
+    
+    private function addPageSizeSelector( $tab ) {
+        $output = $this->getOutput();
+        $request = $this->getRequest();
+        
+        $offset = $request->getInt( 'offset', 0 );
+        
+        $html = Html::openElement( 'div', [ 'class' => 'sivug-page-size-selector' ] );
+        $html .= Html::element( 'span', [], $this->msg( 'sivugvehashlama-page-size' )->text() . ': ' );
+        
+        foreach ( $this->pageSizes as $size ) {
+            $class = ( $size == $this->itemsPerPage ) ? 'sivug-page-size-current' : '';
+            
+            $html .= Html::rawElement( 'a',
+                [
+                    'href' => $this->getPageTitle( $tab )->getLocalURL( [
+                        'limit' => $size,
+                        'offset' => $offset
+                    ] ),
+                    'class' => 'sivug-page-size ' . $class
+                ],
+                $size
+            );
+            
+            $html .= ' ';
+        }
+        
+        $html .= Html::closeElement( 'div' );
+        $output->addHTML( $html );
+    }
+    
+    private function addPaginationLinks( $tab, $offset, $total ) {
+        $output = $this->getOutput();
+        
+        if ( $total <= $this->itemsPerPage ) {
+            return;
+        }
+        
+        $html = Html::openElement( 'div', [ 'class' => 'sivug-pagination' ] );
+        
+        $currentPage = floor( $offset / $this->itemsPerPage ) + 1;
+        $totalPages = ceil( $total / $this->itemsPerPage );
+        
+        if ( $offset > 0 ) {
+            $prevOffset = max( 0, $offset - $this->itemsPerPage );
+            $html .= Html::rawElement( 'a',
+                [
+                    'href' => $this->getPageTitle( $tab )->getLocalURL( [
+                        'limit' => $this->itemsPerPage,
+                        'offset' => $prevOffset
+                    ] ),
+                    'class' => 'sivug-page-link sivug-prev'
+                ],
+                '&lt; ' . $this->msg( 'sivugvehashlama-prev' )->text()
+            );
+        }
+        
+        $html .= Html::element( 'span',
+            [ 'class' => 'sivug-page-info' ],
+            $this->msg( 'sivugvehashlama-page-of', $currentPage, $totalPages )->text()
+        );
+        
+        if ( $offset + $this->itemsPerPage < $total ) {
+            $nextOffset = $offset + $this->itemsPerPage;
+            $html .= Html::rawElement( 'a',
+                [
+                    'href' => $this->getPageTitle( $tab )->getLocalURL( [
+                        'limit' => $this->itemsPerPage,
+                        'offset' => $nextOffset
+                    ] ),
+                    'class' => 'sivug-page-link sivug-next'
+                ],
+                $this->msg( 'sivugvehashlama-next' )->text() . ' &gt;'
+            );
+        }
+        
+        $html .= Html::closeElement( 'div' );
         $output->addHTML( $html );
     }
     

@@ -1,10 +1,10 @@
 {
     "name": "SivugVehashlama",
-    "version": "1.0.0",
+    "version": "1.0",
     "author": [
         "[https://www.hamichlol.org.il/משתמש:נריה נריה]"
     ],
-    "url": "https://www.hamichlol.org.il",
+    "url": "https://www.hamichlol.org.il/המכלול:מיזמים/תחרות_סיווג_והשלמה",
     "descriptionmsg": "sivugvehashlama-desc",
     "license-name": "MIT",
     "type": "aspaklarya",
