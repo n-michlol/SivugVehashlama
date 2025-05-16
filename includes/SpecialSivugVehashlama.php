@@ -201,7 +201,12 @@ class SpecialSivugVehashlama extends SpecialPage {
         $html = Html::openElement( 'div', [ 'class' => 'sivug-item' ] );
         
         $html .= Html::rawElement( 'div', [ 'class' => 'sivug-item-title' ],
-            Html::element( 'h3', [], $title->getPrefixedText() )
+            Html::rawElement( 'h3', [], 
+                Html::rawElement( 'a', 
+                    [ 'href' => $title->getLocalURL() ],
+                    $title->getPrefixedText()
+                )
+            )
         );
         
         $html .= Html::openElement( 'div', [ 'class' => 'sivug-item-actions' ] );
@@ -315,13 +320,18 @@ class SpecialSivugVehashlama extends SpecialPage {
             $html .= Html::openElement( 'tr' );
             
             $html .= Html::rawElement( 'td', [],
-                Html::element( 'a', 
+                Html::rawElement( 'a', 
                     [ 'href' => $title->getLocalURL() ],
                     $title->getPrefixedText()
                 )
             );
             
-            $html .= Html::element( 'td', [], $userName );
+            $html .= Html::rawElement( 'td', [],
+                $user ? Html::rawElement( 'a',
+                    [ 'href' => $user->getUserPage()->getLocalURL() ],
+                    $userName
+                ) : ''
+            );
             
             $html .= Html::element( 'td', [], 
                 $this->getLanguage()->timeanddate( wfTimestamp( TS_MW, $page['timestamp'] ) ) 
