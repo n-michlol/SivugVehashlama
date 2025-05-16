@@ -9,5 +9,5 @@ $specialPageAliases['en'] = array(
 
 /** Hebrew (עברית) */
 $specialPageAliases['he'] = array(
-    'SivugVehashlama' => array( 'סיווג_והשלמה', 'סיווג_והשלמת_ניקוי_אספקלריה' ),
+    'SivugVehashlama' => array( 'סיווג_והשלמה', 'מיזם_סיווג_והשלמה' ),
 );

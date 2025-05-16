@@ -244,7 +244,7 @@ class SpecialSivugVehashlama extends SpecialPage {
         $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama' )->text() );
         $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama-classified-by' )->text() );
         $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama-classification-date' )->text() );
-        $html .= Html::element( 'th', [], $this->msg( 'action' )->text() );
+        $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama-action' )->text() );
         $html .= Html::closeElement( 'tr' );
         
         foreach ( $pages as $page ) {
