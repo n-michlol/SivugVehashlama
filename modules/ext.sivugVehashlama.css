@@ -84,6 +84,14 @@
     border-color: #14866d;
 }
 
+.sivug-source-container {
+    margin: 1em 0;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background-color: #fff;
+    padding: 1em;
+}
+
 .sivug-source {
     max-height: 500px;
     overflow-y: auto;
@@ -103,6 +111,19 @@
 
 .sivug-table {
     width: 100%;
+}
+
+.sivug-loading {
+    margin: 1em 0;
+    padding: 0.5em;
+    background-color: #efefef;
+    color: #666;
+    text-align: center;
+    border-radius: 3px;
+}
+
+.sivug-close-source {
+    background-color: #eaecf0;
 }
 
 @media (max-width: 768px) {
