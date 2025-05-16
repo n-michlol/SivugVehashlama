@@ -2,15 +2,29 @@
 
 class SivugVehashlamaDatabase {
 
-    public function getPendingPages() {
+    public function getPendingPages($limit = null, $offset = 0) {
         $dbr = wfGetDB( DB_REPLICA );
+        
+        $totalRows = $dbr->selectRowCount(
+            'sivugvehashlama_pages',
+            '*',
+            [ 'status' => 'pending' ],
+            __METHOD__
+        );
+        
+        $options = [ 'ORDER BY' => 'page_id' ];
+        
+        if ($limit !== null) {
+            $options['LIMIT'] = $limit;
+            $options['OFFSET'] = $offset;
+        }
         
         $result = $dbr->select(
             'sivugvehashlama_pages',
             [ 'page_id' ],
             [ 'status' => 'pending' ],
             __METHOD__,
-            [ 'ORDER BY' => 'page_id' ]
+            $options
         );
         
         $pages = [];
@@ -20,26 +34,43 @@ class SivugVehashlamaDatabase {
             ];
         }
         
-        return $pages;
+        return [
+            'pages' => $pages,
+            'total' => $totalRows
+        ];
     }
     
-    public function getSimplePages() {
-        return $this->getClassifiedPages( 'simple' );
+    public function getSimplePages($limit = null, $offset = 0) {
+        return $this->getClassifiedPages( 'simple', $limit, $offset );
     }
     
-    public function getComplexPages() {
-        return $this->getClassifiedPages( 'complex' );
+    public function getComplexPages($limit = null, $offset = 0) {
+        return $this->getClassifiedPages( 'complex', $limit, $offset );
     }
     
-    private function getClassifiedPages( $type ) {
+    private function getClassifiedPages( $type, $limit = null, $offset = 0 ) {
         $dbr = wfGetDB( DB_REPLICA );
+        
+        $totalRows = $dbr->selectRowCount(
+            'sivugvehashlama_pages',
+            '*',
+            [ 'status' => $type ],
+            __METHOD__
+        );
+        
+        $options = [ 'ORDER BY' => 'timestamp DESC' ];
+        
+        if ($limit !== null) {
+            $options['LIMIT'] = $limit;
+            $options['OFFSET'] = $offset;
+        }
         
         $result = $dbr->select(
             'sivugvehashlama_pages',
             [ 'page_id', 'user_id', 'timestamp' ],
             [ 'status' => $type ],
             __METHOD__,
-            [ 'ORDER BY' => 'timestamp DESC' ]
+            $options
         );
         
         $pages = [];
@@ -51,7 +82,10 @@ class SivugVehashlamaDatabase {
             ];
         }
         
-        return $pages;
+        return [
+            'pages' => $pages,
+            'total' => $totalRows
+        ];
     }
     
     public function markPageAsSimple( $pageId, $userId ) {

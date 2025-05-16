@@ -29,5 +29,9 @@
     "logentry-sivugvehashlama-markcomplexdone": "$1 {{GENDER:$2|טיפל|טיפלה}} בערך המורכב $3",
     "sivugvehashlama-confirm-simple": "האם אתה בטוח שברצונך לסמן ערך זה כדורש טיפול פשוט?",
     "sivugvehashlama-confirm-complex": "האם אתה בטוח שברצונך לסמן ערך זה כדורש טיפול מורכב?",
-    "sivugvehashlama-confirm-done": "האם אתה בטוח שברצונך לסמן ערך זה כמטופל?"
+    "sivugvehashlama-confirm-done": "האם אתה בטוח שברצונך לסמן ערך זה כמטופל?",
+    "sivugvehashlama-page-size": "הצג בדף",
+    "sivugvehashlama-prev": "הקודם",
+    "sivugvehashlama-next": "הבא",
+    "sivugvehashlama-page-of": "דף $1 מתוך $2"
 }
