@@ -57,8 +57,6 @@
     },
     "Hooks": {
         "LoadExtensionSchemaUpdates": "SivugVehashlamaHooks::onLoadExtensionSchemaUpdates",
-        "LogNames": "SivugVehashlamaHooks::onLogNames",
-        "LogHeadersLogHeaders": "SivugVehashlamaHooks::onLogHeadersLogHeaders",
         "LogActions": "SivugVehashlamaHooks::onLogActions",
         "LogFormatter": "SivugVehashlamaHooks::onLogFormatter"
     },
@@ -73,6 +71,12 @@
     "LogTypes": [
         "sivugvehashlama"
     ],
+    "LogNames": {
+        "sivugvehashlama": "log-name-sivugvehashlama"
+    },
+    "LogHeaders": {
+        "sivugvehashlama": "log-description-sivugvehashlama"
+    },
     "LogActionsHandlers": {
         "sivugvehashlama/*": "SivugVehashlamaLogFormatter"
     },

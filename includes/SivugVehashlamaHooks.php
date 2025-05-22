@@ -13,16 +13,6 @@ class SivugVehashlamaHooks {
         return true;
     }
 
-    public static function onLogNames( &$logTypes ) {
-        $logTypes['sivugvehashlama'] = 'log-name-sivugvehashlama';
-        return true;
-    }
-    
-    public static function onLogHeadersLogHeaders( &$logHeaders ) {
-        $logHeaders['sivugvehashlama'] = 'log-description-sivugvehashlama';
-        return true;
-    }
-    
     public static function onLogActions( &$logActions ) {
         $actions = [
             'marksimple',

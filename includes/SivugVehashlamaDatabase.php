@@ -67,7 +67,7 @@ class SivugVehashlamaDatabase {
         
         $result = $dbr->select(
             'sivugvehashlama_pages',
-            [ 'page_id', 'user_id', 'timestamp' ],
+            [ 'page_id', 'timestamp' ],
             [ 'status' => $type ],
             __METHOD__,
             $options
@@ -77,7 +77,6 @@ class SivugVehashlamaDatabase {
         foreach ( $result as $row ) {
             $pages[] = [
                 'page_id' => $row->page_id,
-                'user_id' => $row->user_id,
                 'timestamp' => $row->timestamp
             ];
         }
@@ -89,11 +88,11 @@ class SivugVehashlamaDatabase {
     }
     
     public function markPageAsSimple( $pageId, $userId ) {
-        $this->markPage( $pageId, $userId, 'simple' );
+        $this->markPage( $pageId, 'simple' );
     }
     
     public function markPageAsComplex( $pageId, $userId ) {
-        $this->markPage( $pageId, $userId, 'complex' );
+        $this->markPage( $pageId, 'complex' );
     }
     
     public function markPageAsDone( $pageId ) {
@@ -107,14 +106,13 @@ class SivugVehashlamaDatabase {
         );
     }
     
-    private function markPage( $pageId, $userId, $status ) {
+    private function markPage( $pageId, $status ) {
         $dbw = wfGetDB( DB_PRIMARY );
         
         $dbw->update(
             'sivugvehashlama_pages',
             [
                 'status' => $status,
-                'user_id' => $userId,
                 'timestamp' => $dbw->timestamp()
             ],
             [ 'page_id' => $pageId ],
@@ -130,7 +128,6 @@ class SivugVehashlamaDatabase {
             [
                 'page_id' => $pageId,
                 'status' => 'pending',
-                'user_id' => 0,
                 'timestamp' => $dbw->timestamp()
             ],
             __METHOD__,
