@@ -2,12 +2,21 @@
 
 namespace MediaWiki\Extension\SivugVehashlama;
 
-use Wikimedia\Rdbms\IDatabase;
+use MediaWiki\MediaWikiServices;
+use Wikimedia\Timestamp\ConvertibleTimestamp;
 
 class SivugVehashlamaDatabase {
 
+    private function getDbr() {
+        return MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase();
+    }
+    
+    private function getDbw() {
+        return MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase();
+    }
+
     public function getPendingPages($limit = null, $offset = 0) {
-        $dbr = wfGetDB( DB_REPLICA );
+        $dbr = $this->getDbr();
         
         $totalRows = $dbr->selectRowCount(
             'sivugvehashlama_pages',
@@ -53,7 +62,7 @@ class SivugVehashlamaDatabase {
     }
     
     private function getClassifiedPages( $type, $limit = null, $offset = 0 ) {
-        $dbr = wfGetDB( DB_REPLICA );
+        $dbr = $this->getDbr();
         
         $totalRows = $dbr->selectRowCount(
             'sivugvehashlama_pages',
@@ -100,7 +109,7 @@ class SivugVehashlamaDatabase {
     }
     
     public function markPageAsDone( $pageId ) {
-        $dbw = wfGetDB( DB_PRIMARY );
+        $dbw = $this->getDbw();
         
         $dbw->update(
             'sivugvehashlama_pages',
@@ -111,7 +120,7 @@ class SivugVehashlamaDatabase {
     }
     
     private function markPage( $pageId, $status ) {
-        $dbw = wfGetDB( DB_PRIMARY );
+        $dbw = $this->getDbw();
         
         $dbw->update(
             'sivugvehashlama_pages',
@@ -125,7 +134,7 @@ class SivugVehashlamaDatabase {
     }
     
     public function addPage( $pageId ) {
-        $dbw = wfGetDB( DB_PRIMARY );
+        $dbw = $this->getDbw();
         
         $dbw->insert(
             'sivugvehashlama_pages',

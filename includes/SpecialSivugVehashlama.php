@@ -3,10 +3,11 @@
 namespace MediaWiki\Extension\SivugVehashlama;
 
 use Html;
-use ManualLogEntry;
+use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use SpecialPage;
 use Title;
+use Wikimedia\Timestamp\ConvertibleTimestamp;
 
 class SpecialSivugVehashlama extends SpecialPage {
     private $database;
@@ -23,8 +24,9 @@ class SpecialSivugVehashlama extends SpecialPage {
         $user = $this->getUser();
         $request = $this->getRequest();
         $output = $this->getOutput();
+        $permissionManager = MediaWikiServices::getInstance()->getPermissionManager();
         
-        if ( !$user->isAllowed( 'sivugvehashlama' ) ) {
+        if ( !$permissionManager->userHasRight( $user, 'sivugvehashlama' ) ) {
             $output->addWikiMsg( 'sivugvehashlama-permission-denied' );
             return;
         }
@@ -101,10 +103,19 @@ class SpecialSivugVehashlama extends SpecialPage {
         }
         
         if ( $logEntry ) {
-            $logger = new ManualLogEntry( $logType, $logEntry );
-            $logger->setPerformer( $user );
-            $logger->setTarget( $title );
-            $logger->publish( $logger->insert() );
+            $logger = LoggerFactory::getInstance( 'SivugVehashlama' );
+            $logger->info( "Action performed: {logAction} on page {pageTitle} by user {userName}", [
+                'logAction' => $logEntry,
+                'pageTitle' => $title->getPrefixedText(),
+                'userName' => $user->getName(),
+                'pageId' => $pageId,
+                'userId' => $user->getId()
+            ] );
+            
+            $manualLogEntry = new \ManualLogEntry( $logType, $logEntry );
+            $manualLogEntry->setPerformer( $user );
+            $manualLogEntry->setTarget( $title );
+            $manualLogEntry->publish( $manualLogEntry->insert() );
         }
     }
     
@@ -330,8 +341,9 @@ class SpecialSivugVehashlama extends SpecialPage {
                 )
             );
             
+            $timestamp = new ConvertibleTimestamp( $page['timestamp'] );
             $html .= Html::element( 'td', [], 
-                $this->getLanguage()->timeanddate( wfTimestamp( TS_MW, $page['timestamp'] ) ) 
+                $this->getLanguage()->timeanddate( $timestamp->getTimestamp( TS_MW ) ) 
             );
             
             $html .= Html::rawElement( 'td', [],
