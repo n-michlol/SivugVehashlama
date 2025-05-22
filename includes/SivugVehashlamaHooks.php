@@ -1,5 +1,9 @@
 <?php
 
+namespace MediaWiki\Extension\SivugVehashlama;
+
+use DatabaseUpdater;
+
 class SivugVehashlamaHooks {
 
     public static function onLoadExtensionSchemaUpdates( $updater ) {

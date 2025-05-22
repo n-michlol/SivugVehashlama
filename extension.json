@@ -12,18 +12,15 @@
         "MediaWiki": ">= 1.43.0"
     },
     "SpecialPages": {
-        "SivugVehashlama": "SpecialSivugVehashlama"
+        "SivugVehashlama": "MediaWiki\\Extension\\SivugVehashlama\\SpecialSivugVehashlama"
     },
     "MessagesDirs": {
         "SivugVehashlama": [
             "i18n"
         ]
     },
-    "AutoloadClasses": {
-        "SivugVehashlamaHooks": "includes/SivugVehashlamaHooks.php",
-        "SivugVehashlamaDatabase": "includes/SivugVehashlamaDatabase.php",
-        "SpecialSivugVehashlama": "includes/SpecialSivugVehashlama.php",
-        "SivugVehashlamaLogFormatter": "includes/SivugVehashlamaLogFormatter.php"
+    "AutoloadNamespaces": {
+        "MediaWiki\\Extension\\SivugVehashlama\\": "includes/"
     },
     "ExtensionMessagesFiles": {
         "SivugVehashlamaAlias": "SivugVehashlama.alias.php",
@@ -56,9 +53,9 @@
         "remoteExtPath": "SivugVehashlama"
     },
     "Hooks": {
-        "LoadExtensionSchemaUpdates": "SivugVehashlamaHooks::onLoadExtensionSchemaUpdates",
-        "LogActions": "SivugVehashlamaHooks::onLogActions",
-        "LogFormatter": "SivugVehashlamaHooks::onLogFormatter"
+        "LoadExtensionSchemaUpdates": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onLoadExtensionSchemaUpdates",
+        "LogActions": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onLogActions",
+        "LogFormatter": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onLogFormatter"
     },
     "GroupPermissions": {
         "aspaklaryaEditor": {
@@ -78,7 +75,7 @@
         "sivugvehashlama": "log-description-sivugvehashlama"
     },
     "LogActionsHandlers": {
-        "sivugvehashlama/*": "SivugVehashlamaLogFormatter"
+        "sivugvehashlama/*": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaLogFormatter"
     },
     "manifest_version": 2
 }

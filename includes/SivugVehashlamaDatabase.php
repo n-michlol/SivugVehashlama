@@ -1,5 +1,9 @@
 <?php
 
+namespace MediaWiki\Extension\SivugVehashlama;
+
+use Wikimedia\Rdbms\IDatabase;
+
 class SivugVehashlamaDatabase {
 
     public function getPendingPages($limit = null, $offset = 0) {

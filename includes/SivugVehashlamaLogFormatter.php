@@ -1,5 +1,10 @@
 <?php
 
+namespace MediaWiki\Extension\SivugVehashlama;
+
+use LogFormatter;
+use Title;
+
 class SivugVehashlamaLogFormatter extends LogFormatter {
     protected function getMessageParameters() {
         $params = parent::getMessageParameters();

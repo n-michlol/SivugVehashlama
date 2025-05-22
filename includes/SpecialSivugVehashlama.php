@@ -1,5 +1,13 @@
 <?php
 
+namespace MediaWiki\Extension\SivugVehashlama;
+
+use Html;
+use ManualLogEntry;
+use MediaWiki\MediaWikiServices;
+use SpecialPage;
+use Title;
+
 class SpecialSivugVehashlama extends SpecialPage {
     private $database;
     private $itemsPerPage;
@@ -43,14 +51,14 @@ class SpecialSivugVehashlama extends SpecialPage {
         $itemsPerPage = $request->getInt( 'limit', 0 );
         
         if ( !in_array( $itemsPerPage, $this->pageSizes ) ) {
-            $userOptionsLookup = \MediaWiki\MediaWikiServices::getInstance()->getUserOptionsLookup();
+            $userOptionsLookup = MediaWikiServices::getInstance()->getUserOptionsLookup();
             $itemsPerPage = $userOptionsLookup->getOption( $this->getUser(), 'sivugvehashlama-pagesize', $this->defaultPageSize );
             
             if ( !in_array( $itemsPerPage, $this->pageSizes ) ) {
                 $itemsPerPage = $this->defaultPageSize;
             }
         } else {
-            $userOptionsManager = \MediaWiki\MediaWikiServices::getInstance()->getUserOptionsManager();
+            $userOptionsManager = MediaWikiServices::getInstance()->getUserOptionsManager();
             $userOptionsManager->setOption( $this->getUser(), 'sivugvehashlama-pagesize', $itemsPerPage );
             $userOptionsManager->saveOptions( $this->getUser() );
         }
@@ -432,7 +440,7 @@ class SpecialSivugVehashlama extends SpecialPage {
         
         $output->setPageTitle( $this->msg( 'sivugvehashlama-view-source' )->text() . ': ' . $title->getPrefixedText() );
         
-        $wikiPageFactory = \MediaWiki\MediaWikiServices::getInstance()->getWikiPageFactory();
+        $wikiPageFactory = MediaWikiServices::getInstance()->getWikiPageFactory();
         $page = $wikiPageFactory->newFromTitle( $title );
         $content = $page->getContent();
         
