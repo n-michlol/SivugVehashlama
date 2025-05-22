@@ -7,7 +7,7 @@
     "url": "https://www.hamichlol.org.il/המכלול:מיזמים/תחרות_סיווג_והשלמה",
     "descriptionmsg": "sivugvehashlama-desc",
     "license-name": "MIT",
-    "type": "aspaklarya",
+    "type": "other",
     "requires": {
         "MediaWiki": ">= 1.43.0"
     },
