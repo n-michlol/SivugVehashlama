@@ -298,7 +298,6 @@ class SpecialSivugVehashlama extends SpecialPage {
         
         $html .= Html::openElement( 'tr' );
         $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama' )->text() );
-        $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama-classified-by' )->text() );
         $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama-classification-date' )->text() );
         $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama-action' )->text() );
         $html .= Html::closeElement( 'tr' );
@@ -308,9 +307,6 @@ class SpecialSivugVehashlama extends SpecialPage {
             if ( !$title ) {
                 continue;
             }
-            
-            $user = User::newFromId( $page['user_id'] );
-            $userName = $user ? $user->getName() : '';
             
             $markDoneUrl = $this->getPageTitle()->getLocalURL( [
                 'action' => $type . 'done',
@@ -324,13 +320,6 @@ class SpecialSivugVehashlama extends SpecialPage {
                     [ 'href' => $title->getLocalURL() ],
                     $title->getPrefixedText()
                 )
-            );
-            
-            $html .= Html::rawElement( 'td', [],
-                $user ? Html::rawElement( 'a',
-                    [ 'href' => $user->getUserPage()->getLocalURL() ],
-                    $userName
-                ) : ''
             );
             
             $html .= Html::element( 'td', [], 
