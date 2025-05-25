@@ -2,11 +2,14 @@
 
 namespace MediaWiki\Extension\SivugVehashlama;
 
-use DatabaseUpdater;
+use MediaWiki\Installer\Hook\LoadExtensionSchemaUpdatesHook;
 
-class SivugVehashlamaHooks {
+class SivugVehashlamaHooks implements LoadExtensionSchemaUpdatesHook {
 
-    public static function onLoadExtensionSchemaUpdates( $updater ) {
+    /**
+     * @inheritdoc
+     */
+    public function onLoadExtensionSchemaUpdates( $updater ) {
         $sqlPath = __DIR__ . '/../sql';
         
         $updater->addExtensionTable(
@@ -17,26 +20,4 @@ class SivugVehashlamaHooks {
         return true;
     }
 
-    public static function onLogActions( &$logActions ) {
-        $actions = [
-            'marksimple',
-            'markcomplex',
-            'marksimpledone',
-            'markcomplexdone'
-        ];
-        
-        foreach ( $actions as $action ) {
-            $logActions['sivugvehashlama/' . $action] = 'logentry-sivugvehashlama-' . $action;
-        }
-        
-        return true;
-    }
-
-    public static function onLogFormatter( $type, $action, $entry, &$formatter ) {
-        if ( $type === 'sivugvehashlama' ) {
-            $formatter = new SivugVehashlamaLogFormatter( $entry );
-            return false;
-        }
-        return true;
-    }
 }

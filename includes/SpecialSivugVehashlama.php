@@ -2,11 +2,11 @@
 
 namespace MediaWiki\Extension\SivugVehashlama;
 
-use Html;
+use MediaWiki\Html\Html;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
-use SpecialPage;
-use Title;
+use MediaWiki\SpecialPage\SpecialPage;
+use MediaWiki\Title\Title;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
 class SpecialSivugVehashlama extends SpecialPage {
