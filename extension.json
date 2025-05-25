@@ -53,9 +53,7 @@
         "remoteExtPath": "SivugVehashlama"
     },
     "Hooks": {
-        "LoadExtensionSchemaUpdates": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onLoadExtensionSchemaUpdates",
-        "LogActions": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onLogActions",
-        "LogFormatter": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onLogFormatter"
+        "LoadExtensionSchemaUpdates": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onLoadExtensionSchemaUpdates"
     },
     "GroupPermissions": {
         "aspaklaryaEditor": {
