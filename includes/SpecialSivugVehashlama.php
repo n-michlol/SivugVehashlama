@@ -4,9 +4,11 @@ namespace MediaWiki\Extension\SivugVehashlama;
 
 use MediaWiki\Html\Html;
 use MediaWiki\Logger\LoggerFactory;
+use MediaWiki\Logging\LogEntry;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Title\Title;
+use ManualLogEntry;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
 class SpecialSivugVehashlama extends SpecialPage {
@@ -21,19 +23,15 @@ class SpecialSivugVehashlama extends SpecialPage {
     }
     
     public function execute( $subPage ) {
+        $this->setHeaders();
+        $this->checkPermissions();
+        
         $user = $this->getUser();
         $request = $this->getRequest();
         $output = $this->getOutput();
-        $permissionManager = MediaWikiServices::getInstance()->getPermissionManager();
-        
-        if ( !$permissionManager->userHasRight( $user, 'sivugvehashlama' ) ) {
-            $output->addWikiMsg( 'sivugvehashlama-permission-denied' );
-            return;
-        }
         
         $this->setItemsPerPage( $request );
         
-        $this->setHeaders();
         $output->addModules( 'ext.sivugVehashlama' );
         
         if ( $request->getVal( 'action' ) === 'viewsource' ) {
@@ -53,14 +51,20 @@ class SpecialSivugVehashlama extends SpecialPage {
         $itemsPerPage = $request->getInt( 'limit', 0 );
         
         if ( !in_array( $itemsPerPage, $this->pageSizes ) ) {
-            $userOptionsLookup = MediaWikiServices::getInstance()->getUserOptionsLookup();
-            $itemsPerPage = $userOptionsLookup->getOption( $this->getUser(), 'sivugvehashlama-pagesize', $this->defaultPageSize );
+            $services = MediaWikiServices::getInstance();
+            $userOptionsLookup = $services->getUserOptionsLookup();
+            $itemsPerPage = $userOptionsLookup->getOption( 
+                $this->getUser(), 
+                'sivugvehashlama-pagesize', 
+                $this->defaultPageSize 
+            );
             
             if ( !in_array( $itemsPerPage, $this->pageSizes ) ) {
                 $itemsPerPage = $this->defaultPageSize;
             }
         } else {
-            $userOptionsManager = MediaWikiServices::getInstance()->getUserOptionsManager();
+            $services = MediaWikiServices::getInstance();
+            $userOptionsManager = $services->getUserOptionsManager();
             $userOptionsManager->setOption( $this->getUser(), 'sivugvehashlama-pagesize', $itemsPerPage );
             $userOptionsManager->saveOptions( $this->getUser() );
         }
@@ -112,17 +116,15 @@ class SpecialSivugVehashlama extends SpecialPage {
                 'userId' => $user->getId()
             ] );
             
-            $manualLogEntry = new \ManualLogEntry( $logType, $logEntry );
+            $manualLogEntry = new ManualLogEntry( $logType, $logEntry );
             $manualLogEntry->setPerformer( $user );
             $manualLogEntry->setTarget( $title );
-            $manualLogEntry->publish( $manualLogEntry->insert() );
+            $logId = $manualLogEntry->insert();
+            $manualLogEntry->publish( $logId );
         }
     }
     
     private function displayInterface( $subPage ) {
-        $output = $this->getOutput();
-        $request = $this->getRequest();
-        
         $this->addTabs( $subPage );
         
         $tab = $subPage ?: 'pending';
@@ -383,7 +385,7 @@ class SpecialSivugVehashlama extends SpecialPage {
                     ] ),
                     'class' => 'sivug-page-size ' . $class
                 ],
-                $size
+                (string)$size
             );
             
             $html .= ' ';
@@ -452,7 +454,8 @@ class SpecialSivugVehashlama extends SpecialPage {
         
         $output->setPageTitle( $this->msg( 'sivugvehashlama-view-source' )->text() . ': ' . $title->getPrefixedText() );
         
-        $wikiPageFactory = MediaWikiServices::getInstance()->getWikiPageFactory();
+        $services = MediaWikiServices::getInstance();
+        $wikiPageFactory = $services->getWikiPageFactory();
         $page = $wikiPageFactory->newFromTitle( $title );
         $content = $page->getContent();
         

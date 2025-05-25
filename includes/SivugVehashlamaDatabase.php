@@ -3,19 +3,23 @@
 namespace MediaWiki\Extension\SivugVehashlama;
 
 use MediaWiki\MediaWikiServices;
-use Wikimedia\Timestamp\ConvertibleTimestamp;
+use Wikimedia\Rdbms\IDatabase;
 
 class SivugVehashlamaDatabase {
 
-    private function getDbr() {
-        return MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase();
+    private function getDbr(): IDatabase {
+        return MediaWikiServices::getInstance()
+            ->getConnectionProvider()
+            ->getReplicaDatabase();
     }
     
-    private function getDbw() {
-        return MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase();
+    private function getDbw(): IDatabase {
+        return MediaWikiServices::getInstance()
+            ->getConnectionProvider()
+            ->getPrimaryDatabase();
     }
 
-    public function getPendingPages($limit = null, $offset = 0) {
+    public function getPendingPages( $limit = null, $offset = 0 ): array {
         $dbr = $this->getDbr();
         
         $totalRows = $dbr->selectRowCount(
@@ -27,7 +31,7 @@ class SivugVehashlamaDatabase {
         
         $options = [ 'ORDER BY' => 'page_id' ];
         
-        if ($limit !== null) {
+        if ( $limit !== null ) {
             $options['LIMIT'] = $limit;
             $options['OFFSET'] = $offset;
         }
@@ -43,25 +47,25 @@ class SivugVehashlamaDatabase {
         $pages = [];
         foreach ( $result as $row ) {
             $pages[] = [
-                'page_id' => $row->page_id
+                'page_id' => (int)$row->page_id
             ];
         }
         
         return [
             'pages' => $pages,
-            'total' => $totalRows
+            'total' => (int)$totalRows
         ];
     }
     
-    public function getSimplePages($limit = null, $offset = 0) {
+    public function getSimplePages( $limit = null, $offset = 0 ): array {
         return $this->getClassifiedPages( 'simple', $limit, $offset );
     }
     
-    public function getComplexPages($limit = null, $offset = 0) {
+    public function getComplexPages( $limit = null, $offset = 0 ): array {
         return $this->getClassifiedPages( 'complex', $limit, $offset );
     }
     
-    private function getClassifiedPages( $type, $limit = null, $offset = 0 ) {
+    private function getClassifiedPages( string $type, $limit = null, $offset = 0 ): array {
         $dbr = $this->getDbr();
         
         $totalRows = $dbr->selectRowCount(
@@ -73,7 +77,7 @@ class SivugVehashlamaDatabase {
         
         $options = [ 'ORDER BY' => 'timestamp DESC' ];
         
-        if ($limit !== null) {
+        if ( $limit !== null ) {
             $options['LIMIT'] = $limit;
             $options['OFFSET'] = $offset;
         }
@@ -89,26 +93,26 @@ class SivugVehashlamaDatabase {
         $pages = [];
         foreach ( $result as $row ) {
             $pages[] = [
-                'page_id' => $row->page_id,
+                'page_id' => (int)$row->page_id,
                 'timestamp' => $row->timestamp
             ];
         }
         
         return [
             'pages' => $pages,
-            'total' => $totalRows
+            'total' => (int)$totalRows
         ];
     }
     
-    public function markPageAsSimple( $pageId, $userId ) {
+    public function markPageAsSimple( int $pageId, int $userId ): void {
         $this->markPage( $pageId, 'simple' );
     }
     
-    public function markPageAsComplex( $pageId, $userId ) {
+    public function markPageAsComplex( int $pageId, int $userId ): void {
         $this->markPage( $pageId, 'complex' );
     }
     
-    public function markPageAsDone( $pageId ) {
+    public function markPageAsDone( int $pageId ): void {
         $dbw = $this->getDbw();
         
         $dbw->update(
@@ -119,7 +123,7 @@ class SivugVehashlamaDatabase {
         );
     }
     
-    private function markPage( $pageId, $status ) {
+    private function markPage( int $pageId, string $status ): void {
         $dbw = $this->getDbw();
         
         $dbw->update(
@@ -133,7 +137,7 @@ class SivugVehashlamaDatabase {
         );
     }
     
-    public function addPage( $pageId ) {
+    public function addPage( int $pageId ): void {
         $dbw = $this->getDbw();
         
         $dbw->insert(
