@@ -53,7 +53,8 @@
         "remoteExtPath": "SivugVehashlama"
     },
     "Hooks": {
-        "LoadExtensionSchemaUpdates": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onLoadExtensionSchemaUpdates"
+        "LoadExtensionSchemaUpdates": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onLoadExtensionSchemaUpdates",
+        "PageDeleteComplete": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onPageDeleteComplete"
     },
     "GroupPermissions": {
         "aspaklaryaEditor": {
@@ -71,9 +72,6 @@
     },
     "LogHeaders": {
         "sivugvehashlama": "log-description-sivugvehashlama"
-    },
-    "LogActionsHandlers": {
-        "sivugvehashlama/*": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaLogFormatter"
     },
     "manifest_version": 2
 }
