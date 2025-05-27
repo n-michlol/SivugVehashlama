@@ -148,7 +148,6 @@ class Main {
     public function markPageAsDone ( int $pageId, User $performer, string $comment, ): Status {
         $db = $this->loadBalancer->getConnection( DB_PRIMARY );
 
-        // Check if the page exists
         $svId = $db->selectRow(
             self::PAGES_TABLE_NAME,
             [ 'sv_id' ],
@@ -162,7 +161,7 @@ class Main {
 
         $db->delete(
             self::PAGES_TABLE_NAME,
-            [ self::PAGES_PAGE_COLUMN => $pageId ],
+            [ self::PAGES_PAGE_COLUMN => $pageId, 'sv_id' => $svId->sv_id ],
             __METHOD__
         );
 
