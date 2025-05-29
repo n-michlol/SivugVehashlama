@@ -5,10 +5,13 @@ namespace MediaWiki\Extension\SivugVehashlama;
 use MediaWiki\Html\Html;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\Logging\LogEntry;
+
 use MediaWiki\MediaWikiServices;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Title\Title;
 use ManualLogEntry;
+use MediaWiki\User\Options\UserOptionsLookup;
+use MediaWiki\User\User;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
 class SpecialSivugVehashlama extends SpecialPage {
@@ -16,9 +19,11 @@ class SpecialSivugVehashlama extends SpecialPage {
     private $itemsPerPage;
     private $pageSizes = [20, 50, 100, 200];
     private $defaultPageSize = 50;
+    private UserOptionsLookup $userOptionsLookup;
     
-    public function __construct() {
+    public function __construct( UserOptionsLookup $userOptionsLookup ) {
         parent::__construct( 'SivugVehashlama', 'sivugvehashlama' );
+        $this->userOptionsLookup = $userOptionsLookup;
         $this->database = new SivugVehashlamaDatabase();
     }
     
@@ -46,6 +51,17 @@ class SpecialSivugVehashlama extends SpecialPage {
         
         $this->displayInterface( $subPage );
     }
+
+    public function getDefaultLimit() {
+		return $this->userOptionsLookup->getIntOption( $this->getUser(), 'rclimit' );
+	}
+
+	/**
+	 * @return string
+	 */
+	private function getLimitPreferenceName(): string {
+		return 'sivugvehashlama-pagesize'; 
+	}
     
     private function setItemsPerPage( $request ) {
         $itemsPerPage = $request->getInt( 'limit', 0 );
