@@ -25,11 +25,11 @@ class SivugVehashlamaDatabase {
         $totalRows = $dbr->selectRowCount(
             'sivugvehashlama_pages',
             '*',
-            [ 'status' => 'pending' ],
+            [ 'sv_complex' => null ],
             __METHOD__
         );
         
-        $options = [ 'ORDER BY' => 'page_id' ];
+        $options = [ 'ORDER BY' => 'sv_page_id' ];
         
         if ( $limit !== null ) {
             $options['LIMIT'] = $limit;
@@ -38,8 +38,8 @@ class SivugVehashlamaDatabase {
         
         $result = $dbr->select(
             'sivugvehashlama_pages',
-            [ 'page_id' ],
-            [ 'status' => 'pending' ],
+            [ 'sv_page_id' ],
+            [ 'sv_complex' => null ],
             __METHOD__,
             $options
         );
@@ -47,7 +47,7 @@ class SivugVehashlamaDatabase {
         $pages = [];
         foreach ( $result as $row ) {
             $pages[] = [
-                'page_id' => (int)$row->page_id
+                'page_id' => (int)$row->sv_page_id
             ];
         }
         
@@ -57,25 +57,18 @@ class SivugVehashlamaDatabase {
         ];
     }
     
-    public function getSimplePages( $limit = null, $offset = 0 ): array {
-        return $this->getClassifiedPages( 'simple', $limit, $offset );
-    }
-    
-    public function getComplexPages( $limit = null, $offset = 0 ): array {
-        return $this->getClassifiedPages( 'complex', $limit, $offset );
-    }
-    
     private function getClassifiedPages( string $type, $limit = null, $offset = 0 ): array {
         $dbr = $this->getDbr();
+        $complex_value = ($type === 'complex') ? 1 : 0;
         
         $totalRows = $dbr->selectRowCount(
             'sivugvehashlama_pages',
             '*',
-            [ 'status' => $type ],
+            [ 'sv_complex' => $complex_value ],
             __METHOD__
         );
         
-        $options = [ 'ORDER BY' => 'timestamp DESC' ];
+        $options = [ 'ORDER BY' => 'sv_page_id DESC' ];
         
         if ( $limit !== null ) {
             $options['LIMIT'] = $limit;
@@ -84,8 +77,8 @@ class SivugVehashlamaDatabase {
         
         $result = $dbr->select(
             'sivugvehashlama_pages',
-            [ 'page_id', 'timestamp' ],
-            [ 'status' => $type ],
+            [ 'sv_page_id' ],
+            [ 'sv_complex' => $complex_value ],
             __METHOD__,
             $options
         );
@@ -93,8 +86,8 @@ class SivugVehashlamaDatabase {
         $pages = [];
         foreach ( $result as $row ) {
             $pages[] = [
-                'page_id' => (int)$row->page_id,
-                'timestamp' => $row->timestamp
+                'page_id' => (int)$row->sv_page_id,
+                'timestamp' => null // אין timestamp בטבלה הנוכחית
             ];
         }
         
@@ -105,34 +98,34 @@ class SivugVehashlamaDatabase {
     }
     
     public function markPageAsSimple( int $pageId, int $userId ): void {
-        $this->markPage( $pageId, 'simple' );
+        $this->markPage( $pageId, 0 );
     }
     
     public function markPageAsComplex( int $pageId, int $userId ): void {
-        $this->markPage( $pageId, 'complex' );
+        $this->markPage( $pageId, 1 );
+    }
+    
+    private function markPage( int $pageId, int $complex ): void {
+        $dbw = $this->getDbw();
+        
+        $dbw->upsert(
+            'sivugvehashlama_pages',
+            [
+                'sv_page_id' => $pageId,
+                'sv_complex' => $complex
+            ],
+            [ 'sv_page_id' ],
+            [ 'sv_complex' => $complex ],
+            __METHOD__
+        );
     }
     
     public function markPageAsDone( int $pageId ): void {
         $dbw = $this->getDbw();
         
-        $dbw->update(
+        $dbw->delete(
             'sivugvehashlama_pages',
-            [ 'status' => 'done' ],
-            [ 'page_id' => $pageId ],
-            __METHOD__
-        );
-    }
-    
-    private function markPage( int $pageId, string $status ): void {
-        $dbw = $this->getDbw();
-        
-        $dbw->update(
-            'sivugvehashlama_pages',
-            [
-                'status' => $status,
-                'timestamp' => $dbw->timestamp()
-            ],
-            [ 'page_id' => $pageId ],
+            [ 'sv_page_id' => $pageId ],
             __METHOD__
         );
     }
@@ -143,9 +136,8 @@ class SivugVehashlamaDatabase {
         $dbw->insert(
             'sivugvehashlama_pages',
             [
-                'page_id' => $pageId,
-                'status' => 'pending',
-                'timestamp' => $dbw->timestamp()
+                'sv_page_id' => $pageId,
+                'sv_complex' => null
             ],
             __METHOD__,
             [ 'IGNORE' ]

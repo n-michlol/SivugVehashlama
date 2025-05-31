@@ -16,7 +16,7 @@ class SivugVehashlamaHooks implements LoadExtensionSchemaUpdatesHook, PageDelete
         
         $updater->addExtensionTable(
             'sivugvehashlama_pages',
-            __DIR__ . '../db/' . $type . '/tables-generated.sql'
+            __DIR__ . '/../db/' . $type . '/tables-generated.sql'
         );
         
         return true;

@@ -99,7 +99,7 @@ class Main {
                 self::PAGES_PAGE_COLUMN => $pageId,
             ];
             if ( $complex !== null ) {
-                $insertValues[] = [ self::PAGES_COMPLEX_COLUMN => $complex ? 1 : 0 ];
+                $insertValues[self::PAGES_COMPLEX_COLUMN] = $complex ? 1 : 0;
             } 
             $db->insert(
                 self::PAGES_TABLE_NAME,

@@ -21,12 +21,12 @@ class SpecialSivugVehashlama extends SpecialPage {
     private $defaultPageSize = 50;
     private UserOptionsLookup $userOptionsLookup;
     
-    public function __construct( UserOptionsLookup $userOptionsLookup ) {
+    public function __construct() {
         parent::__construct( 'SivugVehashlama', 'sivugvehashlama' );
-        $this->userOptionsLookup = $userOptionsLookup;
+        $this->userOptionsLookup = MediaWikiServices::getInstance()->getUserOptionsLookup();
         $this->database = new SivugVehashlamaDatabase();
     }
-    
+        
     public function execute( $subPage ) {
         $this->setHeaders();
         $this->checkPermissions();
