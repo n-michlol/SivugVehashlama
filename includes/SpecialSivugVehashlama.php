@@ -1,29 +1,42 @@
 <?php
 
+namespace MediaWiki\Extension\SivugVehashlama;
+
+use MediaWiki\Html\Html;
+use MediaWiki\Logger\LoggerFactory;
+use MediaWiki\Logging\LogEntry;
+
+use MediaWiki\MediaWikiServices;
+use MediaWiki\SpecialPage\SpecialPage;
+use MediaWiki\Title\Title;
+use ManualLogEntry;
+use MediaWiki\User\Options\UserOptionsLookup;
+use MediaWiki\User\User;
+use Wikimedia\Timestamp\ConvertibleTimestamp;
+
 class SpecialSivugVehashlama extends SpecialPage {
     private $database;
     private $itemsPerPage;
     private $pageSizes = [20, 50, 100, 200];
     private $defaultPageSize = 50;
+    private UserOptionsLookup $userOptionsLookup;
     
-    public function __construct() {
+    public function __construct( UserOptionsLookup $userOptionsLookup ) {
         parent::__construct( 'SivugVehashlama', 'sivugvehashlama' );
+        $this->userOptionsLookup = $userOptionsLookup;
         $this->database = new SivugVehashlamaDatabase();
     }
     
     public function execute( $subPage ) {
+        $this->setHeaders();
+        $this->checkPermissions();
+        
         $user = $this->getUser();
         $request = $this->getRequest();
         $output = $this->getOutput();
         
-        if ( !$user->isAllowed( 'sivugvehashlama' ) ) {
-            $output->addWikiMsg( 'sivugvehashlama-permission-denied' );
-            return;
-        }
-        
         $this->setItemsPerPage( $request );
         
-        $this->setHeaders();
         $output->addModules( 'ext.sivugVehashlama' );
         
         if ( $request->getVal( 'action' ) === 'viewsource' ) {
@@ -38,19 +51,36 @@ class SpecialSivugVehashlama extends SpecialPage {
         
         $this->displayInterface( $subPage );
     }
+
+    public function getDefaultLimit() {
+		return $this->userOptionsLookup->getIntOption( $this->getUser(), 'rclimit' );
+	}
+
+	/**
+	 * @return string
+	 */
+	private function getLimitPreferenceName(): string {
+		return 'sivugvehashlama-pagesize'; 
+	}
     
     private function setItemsPerPage( $request ) {
         $itemsPerPage = $request->getInt( 'limit', 0 );
         
         if ( !in_array( $itemsPerPage, $this->pageSizes ) ) {
-            $userOptionsLookup = \MediaWiki\MediaWikiServices::getInstance()->getUserOptionsLookup();
-            $itemsPerPage = $userOptionsLookup->getOption( $this->getUser(), 'sivugvehashlama-pagesize', $this->defaultPageSize );
+            $services = MediaWikiServices::getInstance();
+            $userOptionsLookup = $services->getUserOptionsLookup();
+            $itemsPerPage = $userOptionsLookup->getOption( 
+                $this->getUser(), 
+                'sivugvehashlama-pagesize', 
+                $this->defaultPageSize 
+            );
             
             if ( !in_array( $itemsPerPage, $this->pageSizes ) ) {
                 $itemsPerPage = $this->defaultPageSize;
             }
         } else {
-            $userOptionsManager = \MediaWiki\MediaWikiServices::getInstance()->getUserOptionsManager();
+            $services = MediaWikiServices::getInstance();
+            $userOptionsManager = $services->getUserOptionsManager();
             $userOptionsManager->setOption( $this->getUser(), 'sivugvehashlama-pagesize', $itemsPerPage );
             $userOptionsManager->saveOptions( $this->getUser() );
         }
@@ -93,17 +123,24 @@ class SpecialSivugVehashlama extends SpecialPage {
         }
         
         if ( $logEntry ) {
-            $logger = new ManualLogEntry( $logType, $logEntry );
-            $logger->setPerformer( $user );
-            $logger->setTarget( $title );
-            $logger->publish( $logger->insert() );
+            $logger = LoggerFactory::getInstance( 'SivugVehashlama' );
+            $logger->info( "Action performed: {logAction} on page {pageTitle} by user {userName}", [
+                'logAction' => $logEntry,
+                'pageTitle' => $title->getPrefixedText(),
+                'userName' => $user->getName(),
+                'pageId' => $pageId,
+                'userId' => $user->getId()
+            ] );
+            
+            $manualLogEntry = new ManualLogEntry( $logType, $logEntry );
+            $manualLogEntry->setPerformer( $user );
+            $manualLogEntry->setTarget( $title );
+            $logId = $manualLogEntry->insert();
+            $manualLogEntry->publish( $logId );
         }
     }
     
     private function displayInterface( $subPage ) {
-        $output = $this->getOutput();
-        $request = $this->getRequest();
-        
         $this->addTabs( $subPage );
         
         $tab = $subPage ?: 'pending';
@@ -298,7 +335,6 @@ class SpecialSivugVehashlama extends SpecialPage {
         
         $html .= Html::openElement( 'tr' );
         $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama' )->text() );
-        $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama-classified-by' )->text() );
         $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama-classification-date' )->text() );
         $html .= Html::element( 'th', [], $this->msg( 'sivugvehashlama-action' )->text() );
         $html .= Html::closeElement( 'tr' );
@@ -308,9 +344,6 @@ class SpecialSivugVehashlama extends SpecialPage {
             if ( !$title ) {
                 continue;
             }
-            
-            $user = User::newFromId( $page['user_id'] );
-            $userName = $user ? $user->getName() : '';
             
             $markDoneUrl = $this->getPageTitle()->getLocalURL( [
                 'action' => $type . 'done',
@@ -326,15 +359,8 @@ class SpecialSivugVehashlama extends SpecialPage {
                 )
             );
             
-            $html .= Html::rawElement( 'td', [],
-                $user ? Html::rawElement( 'a',
-                    [ 'href' => $user->getUserPage()->getLocalURL() ],
-                    $userName
-                ) : ''
-            );
-            
             $html .= Html::element( 'td', [], 
-                $this->getLanguage()->timeanddate( wfTimestamp( TS_MW, $page['timestamp'] ) ) 
+                $this->getLanguage()->timeanddate( $timestamp->getTimestamp( TS_MW ) ) 
             );
             
             $html .= Html::rawElement( 'td', [],
@@ -374,7 +400,7 @@ class SpecialSivugVehashlama extends SpecialPage {
                     ] ),
                     'class' => 'sivug-page-size ' . $class
                 ],
-                $size
+                (string)$size
             );
             
             $html .= ' ';
@@ -443,7 +469,8 @@ class SpecialSivugVehashlama extends SpecialPage {
         
         $output->setPageTitle( $this->msg( 'sivugvehashlama-view-source' )->text() . ': ' . $title->getPrefixedText() );
         
-        $wikiPageFactory = \MediaWiki\MediaWikiServices::getInstance()->getWikiPageFactory();
+        $services = MediaWikiServices::getInstance();
+        $wikiPageFactory = $services->getWikiPageFactory();
         $page = $wikiPageFactory->newFromTitle( $title );
         $content = $page->getContent();
         

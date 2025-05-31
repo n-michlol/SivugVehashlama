@@ -1,48 +1,40 @@
 <?php
 
-class SivugVehashlamaHooks {
+namespace MediaWiki\Extension\SivugVehashlama;
 
-    public static function onLoadExtensionSchemaUpdates( $updater ) {
-        $sqlPath = __DIR__ . '/../sql';
+use MediaWiki\Installer\Hook\LoadExtensionSchemaUpdatesHook;
+use MediaWiki\MediaWikiServices;
+use MediaWiki\Page\Hook\PageDeleteCompleteHook;
+
+class SivugVehashlamaHooks implements LoadExtensionSchemaUpdatesHook, PageDeleteCompleteHook {
+
+    /**
+     * @inheritdoc
+     */
+    public function onLoadExtensionSchemaUpdates( $updater ) {
+        $type = $updater->getDB()->getType();
         
         $updater->addExtensionTable(
             'sivugvehashlama_pages',
-            "$sqlPath/sivugvehashlama_pages.sql"
+            __DIR__ . '../db/' . $type . '/tables-generated.sql'
         );
         
         return true;
     }
 
-    public static function onLogNames( &$logTypes ) {
-        $logTypes['sivugvehashlama'] = 'log-name-sivugvehashlama';
-        return true;
-    }
-    
-    public static function onLogHeadersLogHeaders( &$logHeaders ) {
-        $logHeaders['sivugvehashlama'] = 'log-description-sivugvehashlama';
-        return true;
-    }
-    
-    public static function onLogActions( &$logActions ) {
-        $actions = [
-            'marksimple',
-            'markcomplex',
-            'marksimpledone',
-            'markcomplexdone'
-        ];
-        
-        foreach ( $actions as $action ) {
-            $logActions['sivugvehashlama/' . $action] = 'logentry-sivugvehashlama-' . $action;
-        }
+    /**
+     * @inheritdoc
+     */
+    public function onPageDeleteComplete( $page, $user, $reason, $id, $content, $revision, $status ) {
+        // Remove the page from the classification table
+        $dbw = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_PRIMARY );
+        $dbw->delete(
+            'sivugvehashlama_pages',
+            [ 'sv_page_id' => $page->getId() ],
+            __METHOD__
+        );
         
         return true;
     }
 
-    public static function onLogFormatter( $type, $action, $entry, &$formatter ) {
-        if ( $type === 'sivugvehashlama' ) {
-            $formatter = new SivugVehashlamaLogFormatter( $entry );
-            return false;
-        }
-        return true;
-    }
 }

@@ -12,18 +12,15 @@
         "MediaWiki": ">= 1.43.0"
     },
     "SpecialPages": {
-        "SivugVehashlama": "SpecialSivugVehashlama"
+        "SivugVehashlama": "MediaWiki\\Extension\\SivugVehashlama\\SpecialSivugVehashlama"
     },
     "MessagesDirs": {
         "SivugVehashlama": [
             "i18n"
         ]
     },
-    "AutoloadClasses": {
-        "SivugVehashlamaHooks": "includes/SivugVehashlamaHooks.php",
-        "SivugVehashlamaDatabase": "includes/SivugVehashlamaDatabase.php",
-        "SpecialSivugVehashlama": "includes/SpecialSivugVehashlama.php",
-        "SivugVehashlamaLogFormatter": "includes/SivugVehashlamaLogFormatter.php"
+    "AutoloadNamespaces": {
+        "MediaWiki\\Extension\\SivugVehashlama\\": "includes/"
     },
     "ExtensionMessagesFiles": {
         "SivugVehashlamaAlias": "SivugVehashlama.alias.php",
@@ -56,11 +53,8 @@
         "remoteExtPath": "SivugVehashlama"
     },
     "Hooks": {
-        "LoadExtensionSchemaUpdates": "SivugVehashlamaHooks::onLoadExtensionSchemaUpdates",
-        "LogNames": "SivugVehashlamaHooks::onLogNames",
-        "LogHeadersLogHeaders": "SivugVehashlamaHooks::onLogHeadersLogHeaders",
-        "LogActions": "SivugVehashlamaHooks::onLogActions",
-        "LogFormatter": "SivugVehashlamaHooks::onLogFormatter"
+        "LoadExtensionSchemaUpdates": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onLoadExtensionSchemaUpdates",
+        "PageDeleteComplete": "MediaWiki\\Extension\\SivugVehashlama\\SivugVehashlamaHooks::onPageDeleteComplete"
     },
     "GroupPermissions": {
         "aspaklaryaEditor": {
@@ -73,8 +67,11 @@
     "LogTypes": [
         "sivugvehashlama"
     ],
-    "LogActionsHandlers": {
-        "sivugvehashlama/*": "SivugVehashlamaLogFormatter"
+    "LogNames": {
+        "sivugvehashlama": "log-name-sivugvehashlama"
+    },
+    "LogHeaders": {
+        "sivugvehashlama": "log-description-sivugvehashlama"
     },
     "manifest_version": 2
 }

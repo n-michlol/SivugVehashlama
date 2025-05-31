@@ -1,0 +1,51 @@
+[
+    {
+        "name": "sivugvehashlama_pages",
+        "comment": "PLEASE FILL ON THIS COMMENT TO EXPLAIN THE PORPOSE OF THIS TABLE",
+        "columns": [
+            {
+                "name": "sv_id",
+                "type": "integer",
+                "options": {
+                    "unsigned": true,
+                    "notnull": true,
+                    "autoincrement": true
+                }
+            },
+            {
+                "name": "sv_page_id",
+                "type": "integer",
+                "options": {
+                    "unsigned": true,
+                    "notnull": true
+                }
+            },
+            {
+                "name": "sv_complex",
+                "type": "mwtinyint",
+                "options": {
+                    "unsigned": true
+                }
+            }
+        ],
+        "indexes": [
+            {
+                "name": "sv_id",
+                "columns": [
+                    "sv_id"
+                ],
+                "unique": true
+            },
+            {
+                "name": "sv_page_id",
+                "columns": [
+                    "sv_page_id"
+                ],
+                "unique": true
+            }
+        ],
+        "pk": [
+            "sv_id"
+        ]
+    }
+]

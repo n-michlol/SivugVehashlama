@@ -1,9 +1,26 @@
 <?php
 
+namespace MediaWiki\Extension\SivugVehashlama;
+
+use MediaWiki\MediaWikiServices;
+use Wikimedia\Rdbms\IDatabase;
+
 class SivugVehashlamaDatabase {
 
-    public function getPendingPages($limit = null, $offset = 0) {
-        $dbr = wfGetDB( DB_REPLICA );
+    private function getDbr(): IDatabase {
+        return MediaWikiServices::getInstance()
+            ->getConnectionProvider()
+            ->getReplicaDatabase();
+    }
+    
+    private function getDbw(): IDatabase {
+        return MediaWikiServices::getInstance()
+            ->getConnectionProvider()
+            ->getPrimaryDatabase();
+    }
+
+    public function getPendingPages( $limit = null, $offset = 0 ): array {
+        $dbr = $this->getDbr();
         
         $totalRows = $dbr->selectRowCount(
             'sivugvehashlama_pages',
@@ -14,7 +31,7 @@ class SivugVehashlamaDatabase {
         
         $options = [ 'ORDER BY' => 'page_id' ];
         
-        if ($limit !== null) {
+        if ( $limit !== null ) {
             $options['LIMIT'] = $limit;
             $options['OFFSET'] = $offset;
         }
@@ -30,26 +47,26 @@ class SivugVehashlamaDatabase {
         $pages = [];
         foreach ( $result as $row ) {
             $pages[] = [
-                'page_id' => $row->page_id
+                'page_id' => (int)$row->page_id
             ];
         }
         
         return [
             'pages' => $pages,
-            'total' => $totalRows
+            'total' => (int)$totalRows
         ];
     }
     
-    public function getSimplePages($limit = null, $offset = 0) {
+    public function getSimplePages( $limit = null, $offset = 0 ): array {
         return $this->getClassifiedPages( 'simple', $limit, $offset );
     }
     
-    public function getComplexPages($limit = null, $offset = 0) {
+    public function getComplexPages( $limit = null, $offset = 0 ): array {
         return $this->getClassifiedPages( 'complex', $limit, $offset );
     }
     
-    private function getClassifiedPages( $type, $limit = null, $offset = 0 ) {
-        $dbr = wfGetDB( DB_REPLICA );
+    private function getClassifiedPages( string $type, $limit = null, $offset = 0 ): array {
+        $dbr = $this->getDbr();
         
         $totalRows = $dbr->selectRowCount(
             'sivugvehashlama_pages',
@@ -60,14 +77,14 @@ class SivugVehashlamaDatabase {
         
         $options = [ 'ORDER BY' => 'timestamp DESC' ];
         
-        if ($limit !== null) {
+        if ( $limit !== null ) {
             $options['LIMIT'] = $limit;
             $options['OFFSET'] = $offset;
         }
         
         $result = $dbr->select(
             'sivugvehashlama_pages',
-            [ 'page_id', 'user_id', 'timestamp' ],
+            [ 'page_id', 'timestamp' ],
             [ 'status' => $type ],
             __METHOD__,
             $options
@@ -76,28 +93,27 @@ class SivugVehashlamaDatabase {
         $pages = [];
         foreach ( $result as $row ) {
             $pages[] = [
-                'page_id' => $row->page_id,
-                'user_id' => $row->user_id,
+                'page_id' => (int)$row->page_id,
                 'timestamp' => $row->timestamp
             ];
         }
         
         return [
             'pages' => $pages,
-            'total' => $totalRows
+            'total' => (int)$totalRows
         ];
     }
     
-    public function markPageAsSimple( $pageId, $userId ) {
-        $this->markPage( $pageId, $userId, 'simple' );
+    public function markPageAsSimple( int $pageId, int $userId ): void {
+        $this->markPage( $pageId, 'simple' );
     }
     
-    public function markPageAsComplex( $pageId, $userId ) {
-        $this->markPage( $pageId, $userId, 'complex' );
+    public function markPageAsComplex( int $pageId, int $userId ): void {
+        $this->markPage( $pageId, 'complex' );
     }
     
-    public function markPageAsDone( $pageId ) {
-        $dbw = wfGetDB( DB_PRIMARY );
+    public function markPageAsDone( int $pageId ): void {
+        $dbw = $this->getDbw();
         
         $dbw->update(
             'sivugvehashlama_pages',
@@ -107,14 +123,13 @@ class SivugVehashlamaDatabase {
         );
     }
     
-    private function markPage( $pageId, $userId, $status ) {
-        $dbw = wfGetDB( DB_PRIMARY );
+    private function markPage( int $pageId, string $status ): void {
+        $dbw = $this->getDbw();
         
         $dbw->update(
             'sivugvehashlama_pages',
             [
                 'status' => $status,
-                'user_id' => $userId,
                 'timestamp' => $dbw->timestamp()
             ],
             [ 'page_id' => $pageId ],
@@ -122,15 +137,14 @@ class SivugVehashlamaDatabase {
         );
     }
     
-    public function addPage( $pageId ) {
-        $dbw = wfGetDB( DB_PRIMARY );
+    public function addPage( int $pageId ): void {
+        $dbw = $this->getDbw();
         
         $dbw->insert(
             'sivugvehashlama_pages',
             [
                 'page_id' => $pageId,
                 'status' => 'pending',
-                'user_id' => 0,
                 'timestamp' => $dbw->timestamp()
             ],
             __METHOD__,
