@@ -25,7 +25,7 @@ class SivugVehashlamaDatabase {
         $totalRows = $dbr->selectRowCount(
             'sivugvehashlama_pages',
             '*',
-            [ 'sv_complex' => null ],
+            [ 'sv_complex IS NULL' ],
             __METHOD__
         );
         
@@ -39,7 +39,7 @@ class SivugVehashlamaDatabase {
         $result = $dbr->select(
             'sivugvehashlama_pages',
             [ 'sv_page_id' ],
-            [ 'sv_complex' => null ],
+            [ 'sv_complex IS NULL' ],
             __METHOD__,
             $options
         );
@@ -55,6 +55,14 @@ class SivugVehashlamaDatabase {
             'pages' => $pages,
             'total' => (int)$totalRows
         ];
+    }
+    
+    public function getSimplePages( $limit = null, $offset = 0 ): array {
+        return $this->getClassifiedPages( 'simple', $limit, $offset );
+    }
+    
+    public function getComplexPages( $limit = null, $offset = 0 ): array {
+        return $this->getClassifiedPages( 'complex', $limit, $offset );
     }
     
     private function getClassifiedPages( string $type, $limit = null, $offset = 0 ): array {
