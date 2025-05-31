@@ -359,7 +359,6 @@ class SpecialSivugVehashlama extends SpecialPage {
                 )
             );
             
-            $timestamp = new ConvertibleTimestamp( $page['timestamp'] );
             $html .= Html::element( 'td', [], 
                 $this->getLanguage()->timeanddate( $timestamp->getTimestamp( TS_MW ) ) 
             );
